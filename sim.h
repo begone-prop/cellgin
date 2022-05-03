@@ -10,8 +10,8 @@
 #define IS_NEIGHBOUR(X, Y, DX, DY) !((IS_BOUND((X), (DX))) || (IS_BOUND((Y), (DY))))
 
 void zeroState(size_t x, size_t y, int board[][y]);
-size_t countNeighbours(int x, int y, int board[][y], int cx, int cy);
-int nextState(int x, int y, int board[][y], int next[][y]);
-void printBoard(int x, int y, int board[][y]);
-void copyState(int x, int y, const int board[][y], int board2[][y]);
+size_t countNeighbours(size_t x, size_t y, int board[][y], int cx, int cy);
+int nextState(size_t x, size_t y, int board[][y], int next[][y]);
+void printBoard(size_t x, size_t y, int board[][y]);
+void copyState(size_t x, size_t y, const int board[][y], int board2[][y]);
 #endif

@@ -1,7 +1,15 @@
 #include <stdio.h>
 #include "./sim.h"
 
-void copyState(int x, int y, const int board[][y], int board2[][y]) {
+void oneState(size_t x, size_t y, int board[][y]) {
+    for(size_t dx = 0; dx < x; dx++) {
+        for(size_t dy = 0; dy < y; dy++) {
+            board[dx][dy] = 1;
+        }
+    }
+}
+
+void copyState(size_t x, size_t y, const int board[][y], int board2[][y]) {
     for(size_t dx = 0; dx < x; dx++) {
         for(size_t dy = 0; dy < y; dy++) {
             board2[dx][dy] = board[dx][dy];
@@ -9,17 +17,17 @@ void copyState(int x, int y, const int board[][y], int board2[][y]) {
     }
 }
 
-void printBoard(int x, int y, int board[][y]) {
+void printBoard(size_t x, size_t y, int board[][y]) {
     for(size_t dx = 0; dx < x; dx++) {
         for(size_t dy = 0; dy < y; dy++) {
             fprintf(stderr, "%i", board[dx][dy]);
         }
         fprintf(stderr, "\n");
     }
-    fprintf(stderr, "\033[%iA\r", y);
+    fprintf(stderr, "\033[%zuA\r", y);
 }
 
-size_t countNeighbours(int x, int y, int board[][y], int dx, int dy) {
+size_t countNeighbours(size_t x, size_t y, int board[][y], int dx, int dy) {
     size_t alive = 0;
 
     for(int cx = -1; cx <= 1; cx++) {
@@ -29,7 +37,7 @@ size_t countNeighbours(int x, int y, int board[][y], int dx, int dy) {
 
             int offx = cx + dx;
             int offy = cy + dy;
-            if(IS_NEIGHBOUR(x, y, offx, offy)) {
+            if(IS_NEIGHBOUR((int) x, (int) y, offx, offy)) {
                 alive += board[offx][offy];
             }
         }
@@ -46,12 +54,12 @@ void zeroState(size_t x, size_t y, int board[][y]) {
     }
 }
 
-int nextState(int x, int y, int board[][y], int nextState[][y]) {
+int nextState(size_t x, size_t y, int board[][y], int nextState[][y]) {
 
     zeroState(x, y, nextState);
 
-    for(int dx = 0; dx < x; dx++) {
-        for(int dy = 0; dy < y; dy++) {
+    for(size_t dx = 0; dx < x; dx++) {
+        for(size_t dy = 0; dy < y; dy++) {
 
             size_t alive = countNeighbours(x, y, board, dx, dy);
 
