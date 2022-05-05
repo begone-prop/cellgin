@@ -28,17 +28,25 @@ int main(int argc, char **argv) {
     Color pal[] = {BLACK, WHITE};
     bool black = false;
 
-    const size_t cellSize = 25;
+    const size_t cellDens = 15;
+    const Vector2 cell = {
+        .x = (int)(width / cellDens),
+        .y = (int)(width / cellDens),
+    };
 
     Vector2 mouse, prevMouse, tmouse;
 
     size_t frame = 0;
+    Vector2 idx, current;
+    idx.x = 0;
+    idx.y = 0;
     while(!WindowShouldClose()) {
         mouse = GetMousePosition();
 
         if(IsMouseButtonDown(MOUSE_MIDDLE_BUTTON)) {
             Vector2 delta = Vector2Subtract(mouse, prevMouse);
             origin = Vector2Add(origin, delta);
+            current = Vector2Add(current, delta);
         }
 
         if(IsMouseButtonPressed(MOUSE_RIGHT_BUTTON)) {
@@ -46,15 +54,18 @@ int main(int argc, char **argv) {
         }
 
         if(IsMouseButtonPressed(MOUSE_LEFT_BUTTON)) {
-            Vector2 idx = getCellIndex(origin, cellSize);
-        }
+            idx = getCellIndex(origin, cell);
+            current = getCell(origin, cell, idx);
 
+            fprintf(stderr, "(x: %.0f, y: %.0f)\n", idx.x, -idx.y);
+        }
 
         draw:
         BeginDrawing();
         ClearBackground(BLACK);
 
-        drawGrid(origin, cellSize);
+        DrawRectangleV(current, cell, RAYWHITE);
+        drawGrid(origin, cell);
 
         prevMouse = mouse;
         frame = (frame + 1) % 1000;
@@ -62,5 +73,6 @@ int main(int argc, char **argv) {
     }
 
     CloseWindow();
-    return 0;
+
+  return 0;
 }
