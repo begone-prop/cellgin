@@ -1,95 +1,63 @@
+#define _DEFAULT_SOURCE
+
 #include <stdio.h>
+#include <math.h>
 #include <stdbool.h>
 #include <string.h>
 #include <unistd.h>
 #include <stdlib.h>
 #include <raylib.h>
+#include <raymath.h>
 #include <fcntl.h>
 #include "sim.h"
-
-static const int width = 1000;
-static const int height = 1000;
+#include "world.h"
 
 int main(int argc, char **argv) {
     (void) argc;
     (void) argv;
 
-    SetTargetFPS(10);
     InitWindow(width, height, "Game of Life");
     bool animate = false;
+    const Vector2 screenCenter = {
+        .x = (float) width / 2,
+        .y = (float) height / 2
+    };
+
+    Vector2 origin = screenCenter;
 
     Color pal[] = {BLACK, WHITE};
-    bool black = true;
+    bool black = false;
 
-    const size_t rectSize = 25;
-    size_t sizeX = rectSize;
-    size_t sizeY = rectSize;
+    const size_t cellSize = 25;
 
-    double dx = (double) width / sizeX;
-    double dy = (double) height / sizeY;
+    Vector2 mouse, prevMouse, tmouse;
 
-    /*size_t cellsSize = sizeX * sizeY * 16;*/
-    int cells[sizeY][sizeX];
-    int nextCells[sizeY][sizeX];
-
-    zeroState(sizeX, sizeY, cells);
-    zeroState(sizeX, sizeY, nextCells);
-
-    Vector2 prevCell = {0, 0};
-
-    bool hold = false;
+    size_t frame = 0;
     while(!WindowShouldClose()) {
+        mouse = GetMousePosition();
 
-        if(IsMouseButtonPressed(MOUSE_BUTTON_LEFT) || IsMouseButtonDown(MOUSE_BUTTON_LEFT)) {
-            animate = false;
-            SetTargetFPS(60);
-            Vector2 mouse = GetMousePosition();
-
-            int x = mouse.x / dx;
-            int y = mouse.y / dy;
-
-            if(IS_BOUND(width, mouse.x)) goto draw;
-            if(IS_BOUND(height, mouse.y)) goto draw;
-
-            if(IS_BOUND(sizeX, (size_t) x)) goto draw;
-            if(IS_BOUND(sizeY, (size_t) y)) goto draw;
-
-            if(hold && !(x == prevCell.x && y == prevCell.y)) {
-                cells[x][y] = 1;
-            }
-
-            if(!hold) cells[x][y] = !cells[x][y];
-
-            prevCell.x = x;
-            prevCell.y = y;
+        if(IsMouseButtonDown(MOUSE_MIDDLE_BUTTON)) {
+            Vector2 delta = Vector2Subtract(mouse, prevMouse);
+            origin = Vector2Add(origin, delta);
         }
 
         if(IsMouseButtonPressed(MOUSE_RIGHT_BUTTON)) {
-            zeroState(sizeX, sizeY, cells);
+            origin = screenCenter;
         }
 
-        if(IsKeyPressed(KEY_SPACE)) {
-            animate = !animate;
+        if(IsMouseButtonPressed(MOUSE_LEFT_BUTTON)) {
+            Vector2 idx = getCellIndex(origin, cellSize);
         }
+
 
         draw:
         BeginDrawing();
         ClearBackground(BLACK);
 
-        for(size_t x = 0; x < sizeX; x++) {
-            for(size_t y = 0; y < sizeY; y++) {
-                DrawRectangle(dx * x, dy * y, dx, dy, pal[black ^ cells[x][y]]);
-                DrawRectangleLines(dx * x, dy * y, dx, dy, pal[!black ^ cells[x][y]]);
-            }
-        }
+        drawGrid(origin, cellSize);
 
-        if(animate) {
-            SetTargetFPS(10);
-            nextState(sizeX, sizeY, cells, nextCells);
-            copyState(sizeX, sizeY, nextCells, cells);
-        }
-
-        hold = IsMouseButtonDown(MOUSE_BUTTON_LEFT);
+        prevMouse = mouse;
+        frame = (frame + 1) % 1000;
         EndDrawing();
     }
 

@@ -1,5 +1,5 @@
-#ifndef SIM_C
-#define SIM_C
+#ifndef SIM_C_
+#define SIM_C_
 
 #include <stddef.h>
 
