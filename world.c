@@ -15,6 +15,7 @@ Vector2 getCellIndex(Vector2 origin, size_t cellSize, Vector2 offset) {
 
     index.x = (int)(delta.x / size) + (int)sign.x;
     index.y = (int)(delta.y / size) + (int)sign.y;
+    index.y *= -1;
 
     return index;
 }

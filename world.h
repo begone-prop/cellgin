@@ -9,6 +9,11 @@
 static const int width = 1000;
 static const int height = 1000;
 
+static const Vector2 screenCenter = {
+    .x = (float) width / 2,
+    .y = (float) height / 2
+};
+
 void drawGrid(Vector2, size_t);
 Vector2 getCellIndex(Vector2, size_t, Vector2);
 Vector2 getCell(Vector2, size_t, Vector2);

@@ -18,16 +18,12 @@ int main(int argc, char **argv) {
 
     InitWindow(width, height, "Game of Life");
     bool animate = false;
-    const Vector2 screenCenter = {
-        .x = (float) width / 2,
-        .y = (float) height / 2
-    };
 
-    Vector2 origin = screenCenter;
 
+    size_t chunkSize = 10;
     Color pal[] = {BLACK, WHITE};
     bool black = false;
-    static const size_t tick = 30;
+    static const size_t tick = 120;
 
     const size_t cellDens = 15;
     const Vector2 cell = {
@@ -36,9 +32,20 @@ int main(int argc, char **argv) {
     };
     const size_t cellSize = width / cellDens;
 
+    int state[chunkSize][chunkSize];
+    int newState[chunkSize][chunkSize];
+    zeroState(chunkSize, chunkSize, state);
+    zeroState(chunkSize, chunkSize, newState);
+
+    /*Vector2 origin = screenCenter;*/
+    Vector2 origin = {
+        .x = cellSize,
+        .y = width - cellSize,
+    };
+
     Vector2 mouse, prevMouse, tmouse;
 
-    static int grid[10][10];
+
     size_t frame = 0;
     Vector2 idx, current;
     idx.x = 0;
@@ -57,22 +64,42 @@ int main(int argc, char **argv) {
             origin = screenCenter;
         }
 
+        if(IsKeyPressed(KEY_SPACE)) {
+            animate ^= 1;
+        }
+
+        if(IsKeyPressed(KEY_Z)) {
+            zeroState(10, 10, state);
+        }
+
         if(IsMouseButtonPressed(MOUSE_LEFT_BUTTON)) {
             idx = getCellIndex(origin, cellSize, mouse);
-            current = getCell(origin, cellSize, idx);
+            animate = false;
 
-            fprintf(stderr, "(x: %.0f, y: %.0f)\n", idx.x, -idx.y);
+            fprintf(stderr, "(x: %.0f, y: %.0f)\n", idx.x, idx.y);
+            if(idx.x > 0 && idx.y > 0 && idx.x <= 10 && idx.y <= 10)
+                state[(int)idx.x - 1][(int)idx.y - 1] ^= 1;
         }
 
         draw:
         BeginDrawing();
         ClearBackground(BLACK);
 
-        /*DrawRectangleV(current, cell, RAYWHITE);*/
+        /*if(animate && !(frame % tick)) {*/
+            /*nextState(10, 10, state, newState);*/
+            /*copyState(10, 10, newState, state);*/
+        /*}*/
+
+        for(int i = 0; i < chunkSize; i++) {
+            for(int j = 0; j < chunkSize; j++) {
+                Color c = pal[state[i][j]];
+                Vector2 pos = getCell(origin, cellSize, (Vector2){i + 1, -j - 1});
+                DrawRectangleV(pos, cell, c);
+            }
+        }
         drawGrid(origin, cellSize);
 
         prevMouse = mouse;
-        if(!(frame % tick)) fprintf(stderr, "dt: %.05fs\r", GetFrameTime());
         frame = (frame + 1) % tick;
         EndDrawing();
     }
