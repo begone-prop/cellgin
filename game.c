@@ -9,6 +9,7 @@
 #include <raylib.h>
 #include <raymath.h>
 #include <fcntl.h>
+#include <stdint.h>
 #include "sim.h"
 #include "world.h"
 
@@ -19,23 +20,17 @@ int main(int argc, char **argv) {
     InitWindow(width, height, "Game of Life");
     bool animate = false;
 
-
     size_t chunkSize = 10;
     Color pal[] = {BLACK, WHITE};
-    bool black = false;
     static const size_t tick = 120;
 
     const size_t cellDens = 15;
-    const Vector2 cell = {
-        .x = (int)(width / cellDens),
-        .y = (int)(width / cellDens),
-    };
     const size_t cellSize = width / cellDens;
 
-    int state[chunkSize][chunkSize];
-    int newState[chunkSize][chunkSize];
-    zeroState(chunkSize, chunkSize, state);
-    zeroState(chunkSize, chunkSize, newState);
+    /*int state[chunkSize][chunkSize];*/
+    /*int newState[chunkSize][chunkSize];*/
+    /*zeroState(chunkSize, chunkSize, state);*/
+    /*zeroState(chunkSize, chunkSize, newState);*/
 
     /*Vector2 origin = screenCenter;*/
     Vector2 origin = {
@@ -43,11 +38,17 @@ int main(int argc, char **argv) {
         .y = width - cellSize,
     };
 
-    Vector2 mouse, prevMouse, tmouse;
+    board_t board = {
+        .origin = origin,
+        .cellSize = cellSize,
+        .chunkSize = chunkSize
+    };
+
+    Vector2 mouse, prevMouse;
 
 
     size_t frame = 0;
-    Vector2 idx, current;
+    Vector2 idx;
     idx.x = 0;
     idx.y = 0;
 
@@ -56,29 +57,32 @@ int main(int argc, char **argv) {
 
         if(IsMouseButtonDown(MOUSE_MIDDLE_BUTTON)) {
             Vector2 delta = Vector2Subtract(mouse, prevMouse);
-            origin = Vector2Add(origin, delta);
-            current = Vector2Add(current, delta);
+            board.origin = Vector2Add(board.origin, delta);
         }
 
         if(IsMouseButtonPressed(MOUSE_RIGHT_BUTTON)) {
-            origin = screenCenter;
+            board.origin = screenCenter;
         }
 
         if(IsKeyPressed(KEY_SPACE)) {
             animate ^= 1;
         }
 
-        if(IsKeyPressed(KEY_Z)) {
-            zeroState(10, 10, state);
-        }
+        /*if(IsKeyPressed(KEY_Z)) {*/
+            /*zeroState(10, 10, state);*/
+        /*}*/
 
         if(IsMouseButtonPressed(MOUSE_LEFT_BUTTON)) {
-            idx = getCellIndex(origin, cellSize, mouse);
+            idx = getCellIndex(board, mouse);
+            Vector2 chunkidx = getChunkIndex(board, idx);
             animate = false;
 
-            fprintf(stderr, "(x: %.0f, y: %.0f)\n", idx.x, idx.y);
-            if(idx.x > 0 && idx.y > 0 && idx.x <= 10 && idx.y <= 10)
-                state[(int)idx.x - 1][(int)idx.y - 1] ^= 1;
+            fprintf(stderr, "cell: (x: %i, y: %i) chunk: (x: %i, y: %i)\n",
+                    (int)idx.x, (int)idx.y, (int)chunkidx.x, (int)chunkidx.y);
+
+            /*if(idx.x > 0 && idx.y > 0 && idx.x <= 10 && idx.y <= 10)*/
+                /*state[(int)idx.x - 1][(int)idx.y - 1] ^= 1;*/
+
         }
 
         draw:
@@ -90,14 +94,15 @@ int main(int argc, char **argv) {
             /*copyState(10, 10, newState, state);*/
         /*}*/
 
-        for(int i = 0; i < chunkSize; i++) {
-            for(int j = 0; j < chunkSize; j++) {
-                Color c = pal[state[i][j]];
-                Vector2 pos = getCell(origin, cellSize, (Vector2){i + 1, -j - 1});
-                DrawRectangleV(pos, cell, c);
-            }
-        }
-        drawGrid(origin, cellSize);
+        /*for(int i = 0; (size_t)i < chunkSize; i++) {*/
+            /*for(int j = 0; (size_t)j < chunkSize; j++) {*/
+                /*Color c = pal[state[i][j]];*/
+                /*Vector2 pos = getCell(board, (Vector2){i + 1, -j - 1});*/
+                /*DrawRectangleV(pos, (Vector2){cellSize, cellSize}, c);*/
+            /*}*/
+        /*}*/
+
+        drawGrid(board);
 
         prevMouse = mouse;
         frame = (frame + 1) % tick;
