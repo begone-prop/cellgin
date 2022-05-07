@@ -25,7 +25,7 @@ Vector2 getCellIndex(board_t board, Vector2 offset) {
     return index;
 }
 
-Vector2 getCell(board_t board, Vector2 index) {
+Vector2 getCellPosition(board_t board, Vector2 index) {
     float size = (float) board.cellSize;
     Vector2 cord;
     cord.x = index.x * size + board.origin.x - (index.x > 0) * size;

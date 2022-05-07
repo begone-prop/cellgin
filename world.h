@@ -3,6 +3,7 @@
 
 #include <raymath.h>
 #include <stddef.h>
+#include "hashmap.h"
 
 #define SIGN(A) (((A) > 0) * 1 + !((A) > 0) * -1)
 #define VSIGN(A) {.x = SIGN((A.x)), .y = SIGN((A.y))}
@@ -19,10 +20,11 @@ typedef struct board_t {
     Vector2 origin;
     size_t cellSize;
     size_t chunkSize;
+    map_t chunks;
 } board_t;
 
 void drawGrid(board_t);
 Vector2 getCellIndex(board_t, Vector2);
-Vector2 getCell(board_t, Vector2);
+Vector2 getCellPosition(board_t, Vector2);
 Vector2 getChunkIndex(board_t, Vector2);
 #endif
