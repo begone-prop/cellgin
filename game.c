@@ -131,7 +131,9 @@ int main(int argc, char **argv) {
 
             chunk_t *found = insert(&board.chunks, chunkidx, board.chunkSize);
             if(found) {
-                updateChunk(found, rel, board.chunkSize);
+
+                int val = getCellValue(found, rel, board.chunkSize);
+                updateChunk(found, rel, board.chunkSize, (val ^= 1));
             }
 
             if(VEDGE(rel, chunkSize)) {
