@@ -116,20 +116,20 @@ int insert(map_t *entry, Vector2 chunkidx, Vector2 cell) {
         resize(entry, 2);
     }
 
-    if(chunkidx.x == 0 || chunkidx.y == 0 || cell.x == 0 || cell.y == 0)
-        return 0;
+    if(chunkidx.x == 0 || chunkidx.y == 0) return 0;
 
-    size_t idx = map(chunkidx.x, chunkidx.y) % entry->size;
+    size_t idx = map((int)chunkidx.x, (int)chunkidx.y) % entry->size;
     chunk_t *update = search(entry->slots[idx], chunkidx);
 
-    if(update) {
+    if(update != NULL) {
+        update->state[abs((int)cell.y) + 10 * abs((int)cell.x)] ^= 1;
         return 1;
     }
-
 
     chunk_t *chunk = createChunk(chunkidx, 10);
     if(!chunk) return 0;
 
+    chunk->state[abs((int)cell.y) + (10 * abs((int)cell.x))] ^= 1;
     chunk->next = entry->slots[idx];
     entry->slots[idx] = chunk;
     entry->taken++;

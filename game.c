@@ -3,13 +3,9 @@
 #include <stdio.h>
 #include <math.h>
 #include <stdbool.h>
-#include <string.h>
-#include <unistd.h>
 #include <stdlib.h>
 #include <raylib.h>
 #include <raymath.h>
-#include <fcntl.h>
-#include <stdint.h>
 #include "sim.h"
 #include "world.h"
 #include "hashmap.h"
@@ -23,7 +19,7 @@ int main(int argc, char **argv) {
 
     size_t chunkSize = 10;
     Color pal[] = {BLACK, WHITE};
-    static const size_t tick = 75;
+    static const size_t tick = 60;
 
     const size_t cellDens = 15;
     const size_t cellSize = width / cellDens;
@@ -34,11 +30,12 @@ int main(int argc, char **argv) {
     zeroState(chunkSize, chunkSize, state);
     zeroState(chunkSize, chunkSize, newState);
 
-    /*Vector2 origin = screenCenter;*/
-    Vector2 origin = {
-        .x = cellSize,
-        .y = width - cellSize,
-    };
+    Vector2 origin = screenCenter;
+
+    /*Vector2 origin = {*/
+        /*.x = cellSize,*/
+        /*.y = width - cellSize,*/
+    /*};*/
 
     board_t board = {
         .origin = origin,
@@ -62,12 +59,28 @@ int main(int argc, char **argv) {
             board.origin = Vector2Add(board.origin, delta);
         }
 
-        if(IsMouseButtonPressed(MOUSE_RIGHT_BUTTON)) {
-            board.origin = screenCenter;
-        }
+        /*if(IsMouseButtonPressed(MOUSE_RIGHT_BUTTON)) {*/
+            /*board.origin = screenCenter;*/
+        /*}*/
 
         if(IsKeyPressed(KEY_SPACE)) {
             animate ^= 1;
+        }
+
+        if(IsMouseButtonPressed(MOUSE_RIGHT_BUTTON)) {
+            fprintf(stderr, "Event!\n");
+            idx = getCellIndex(board, mouse);
+            Vector2 chunkidx = getChunkIndex(idx, board.chunkSize);
+
+            chunk_t *chosen = find(board.chunks, chunkidx);
+            if(chosen) {
+                for(size_t i = 0; i < board.chunkSize; i++) {
+                    for(size_t j = 0; j < board.chunkSize; j++) {
+                        fprintf(stderr, "%i%s", chosen->state[i + board.chunkSize * j],
+                                j == board.chunkSize -1 ? "\n" : "");
+                    }
+                }
+            }
         }
 
         /*if(IsKeyPressed(KEY_Z)) {*/
@@ -78,27 +91,29 @@ int main(int argc, char **argv) {
             printMap(board.chunks);
         }
 
-        if(IsKeyPressed(KEY_D)) {
-            for(size_t idx = 0; idx < board.chunks.size; idx++) {
-                freeChunkList(board.chunks.slots[idx]);
-            }
+        /*if(IsKeyPressed(KEY_D)) {*/
+            /*for(size_t idx = 0; idx < board.chunks.size; idx++) {*/
+                /*freeChunkList(board.chunks.slots[idx]);*/
+                /*board.chunks.slots[idx] = NULL;*/
+            /*}*/
 
-            board.chunks.size = 0;
-            board.chunks.taken  = 0;
-        }
+            /*board.chunks.size = 0;*/
+            /*board.chunks.taken  = 0;*/
+        /*}*/
 
         if(IsMouseButtonPressed(MOUSE_LEFT_BUTTON)) {
             idx = getCellIndex(board, mouse);
-            Vector2 chunkidx = getChunkIndex(board, idx);
+            Vector2 chunkidx = getChunkIndex(idx, board.chunkSize);
+            Vector2 rel = getRelativeCellIndex(idx, board.chunkSize);
+            Vector2 abs = getAbsoluteCellIndex(chunkidx, rel, board.chunkSize);
             /*animate = false;*/
 
-            fprintf(stderr, "{x: %i, y: %i}: (x: %i, y: %i)\n",
-                    (int)chunkidx.x, (int)chunkidx.y, (int)idx.x, (int)idx.y);
+            fprintf(stderr,
+                    "{x: %i, y: %i}: (x: %i, y: %i) [x: %i, y: %i][x: %i, y: %i]\n",
+                    (int)chunkidx.x, (int)chunkidx.y, (int)idx.x, (int)idx.y,
+                    (int)rel.x, (int)rel.y, (int)abs.x, -(int)abs.y);
 
-            /*insert(&board.chunks, chunkidx, idx);*/
-            /*if(idx.x > 0 && idx.y > 0 && idx.x <= 10 && idx.y <= 10)*/
-                /*state[(int)idx.x - 1][(int)idx.y - 1] ^= 1;*/
-
+            insert(&board.chunks, chunkidx, rel);
         }
 
         draw:
@@ -110,19 +125,40 @@ int main(int argc, char **argv) {
             /*copyState(10, 10, newState, state);*/
         /*}*/
 
-        /*for(int i = 0; (size_t)i < chunkSize; i++) {*/
-            /*for(int j = 0; (size_t)j < chunkSize; j++) {*/
-                /*Color c = pal[state[i][j]];*/
-                /*Vector2 pos = getCellPosition(board, (Vector2){i + 1, -j - 1});*/
-                /*DrawRectangleV(pos, (Vector2){cellSize, cellSize}, c);*/
-            /*}*/
-        /*}*/
+        for(size_t idx = 0; idx < board.chunks.size; idx++) {
+            if(!board.chunks.slots[idx]) continue;
+            for(chunk_t *current = board.chunks.slots[idx]; current; current = current->next) {
+                for(int i = 0; (size_t)i < board.chunkSize; i++) {
+                    for(int j = 0; (size_t)j < board.chunkSize; j++) {
+                        int live = current->state[i + board.chunkSize * j];
+                        Color prim = pal[live];
+                        Color sec = pal[!live];
+                        int y = (i + board.chunkSize * j) % board.chunkSize;
+                        int x = (i + board.chunkSize * j) / board.chunkSize;
+                        Vector2 abso = getAbsoluteCellIndex(current->index, (Vector2){x, y}, board.chunkSize);
+                        Vector2 pos = getCellPosition(board, abso);
 
+                        Rectangle rec = {
+                            .x = pos.x,
+                            .y = pos.y,
+                            .height = cellSize,
+                            .width = cellSize,
+                        };
+
+                        if(live) {
+                            DrawRectangleRec(rec, prim);
+                            DrawRectangleLinesEx(rec, 2.5f, sec);
+                        }
+                    }
+                }
+            }
+        }
         drawGrid(board);
+
 
         prevMouse = mouse;
         frame = (frame + 1) % tick;
-        /*if(!(frame % tick)) fprintf(stderr, "dt: %f\r", GetFrameTime());*/
+        if(!(frame % tick)) fprintf(stderr, "dt: %f\r", GetFrameTime());
         EndDrawing();
     }
 
