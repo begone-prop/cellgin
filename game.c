@@ -126,7 +126,11 @@ int main(int argc, char **argv) {
                     (int)chunkidx.x, (int)chunkidx.y, (int)idx.x, (int)idx.y,
                     (int)rel.x, (int)rel.y);
 
-            insert(&board.chunks, chunkidx, rel);
+            chunk_t *found = insert(&board.chunks, chunkidx, board.chunkSize);
+            if(found) {
+                //
+            }
+
             if(VEDGE(rel, chunkSize)) {
                 fprintf(stderr, "Edge\n");
             }
@@ -139,34 +143,34 @@ int main(int argc, char **argv) {
         /*if(animate && !(frame % tick)) {*/
         /*}*/
 
-        for(size_t idx = 0; idx < board.chunks.size; idx++) {
-            if(!board.chunks.slots[idx]) continue;
-            for(chunk_t *current = board.chunks.slots[idx]; current; current = current->next) {
-                for(int i = 0; (size_t)i < board.chunkSize; i++) {
-                    for(int j = 0; (size_t)j < board.chunkSize; j++) {
-                        int live = current->state[i + board.chunkSize * j];
-                        Color prim = pal[live];
-                        Color sec = pal[!live];
-                        int x = (i + board.chunkSize * j) / board.chunkSize;
-                        int y = (i + board.chunkSize * j) % board.chunkSize;
-                        Vector2 abso = getAbsoluteCellIndex(current->index, (Vector2){x, y}, board.chunkSize);
-                        Vector2 pos = getCellPosition(board, abso);
+        /*for(size_t idx = 0; idx < board.chunks.size; idx++) {*/
+            /*if(!board.chunks.slots[idx]) continue;*/
+            /*for(chunk_t *current = board.chunks.slots[idx]; current; current = current->next) {*/
+                /*for(int i = 0; (size_t)i < board.chunkSize; i++) {*/
+                    /*for(int j = 0; (size_t)j < board.chunkSize; j++) {*/
+                        /*int live = current->state[i + board.chunkSize * j];*/
+                        /*Color prim = pal[live];*/
+                        /*Color sec = pal[!live];*/
+                        /*int x = (i + board.chunkSize * j) / board.chunkSize;*/
+                        /*int y = (i + board.chunkSize * j) % board.chunkSize;*/
+                        /*Vector2 abso = getAbsoluteCellIndex(current->index, (Vector2){x, y}, board.chunkSize);*/
+                        /*Vector2 pos = getCellPosition(board, abso);*/
 
-                        Rectangle rec = {
-                            .x = pos.x,
-                            .y = pos.y,
-                            .height = board.cellSize,
-                            .width = board.cellSize,
-                        };
+                        /*Rectangle rec = {*/
+                            /*.x = pos.x,*/
+                            /*.y = pos.y,*/
+                            /*.height = board.cellSize,*/
+                            /*.width = board.cellSize,*/
+                        /*};*/
 
-                        if(live) {
-                            DrawRectangleRec(rec, prim);
-                            DrawRectangleLinesEx(rec, 2.5f, sec);
-                        }
-                    }
-                }
-            }
-        }
+                        /*if(live) {*/
+                            /*DrawRectangleRec(rec, prim);*/
+                            /*DrawRectangleLinesEx(rec, 2.5f, sec);*/
+                        /*}*/
+                    /*}*/
+                /*}*/
+            /*}*/
+        /*}*/
 
         drawGrid(board);
 

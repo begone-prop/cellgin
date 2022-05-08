@@ -6,6 +6,12 @@ static void freeChunk(chunk_t *);
 void printChunkList(chunk_t *);
 static int resize(map_t *, float);
 
+int updateChunk(chunk_t *chunk, Vector2 cell) {
+    if(!chunk || !chunk->state) return 0;
+    chunk->state[abs((int)cell.y) + (10 * abs((int)cell.x))] ^= 1;
+    return 1;
+}
+
 int resize(map_t *hashmap, float ammount) {
     if(ammount < 0) return 0;
     size_t newSize = hashmap->size * ammount;
@@ -108,7 +114,7 @@ int drop(map_t *hashmap, Vector2 chunkIdx) {
     return 1;
 }
 
-int insert(map_t *entry, Vector2 chunkidx, Vector2 cell) {
+chunk_t *insert(map_t *entry, Vector2 chunkidx, size_t chunkSize) {
 
     if((float) (entry->taken + 1) / entry->size >= GROW_THRESHOLD &&
             entry->size * 2 <= MAX_SIZE) {
@@ -121,19 +127,15 @@ int insert(map_t *entry, Vector2 chunkidx, Vector2 cell) {
     size_t idx = map((int)chunkidx.x, (int)chunkidx.y) % entry->size;
     chunk_t *update = search(entry->slots[idx], chunkidx);
 
-    if(update != NULL) {
-        update->state[abs((int)cell.y) + 10 * abs((int)cell.x)] ^= 1;
-        return 1;
-    }
+    if(update != NULL) return update;
 
-    chunk_t *chunk = createChunk(chunkidx, 10);
-    if(!chunk) return 0;
+    chunk_t *chunk = createChunk(chunkidx, chunkSize);
+    if(!chunk) return NULL;
 
-    chunk->state[abs((int)cell.y) + (10 * abs((int)cell.x))] ^= 1;
     chunk->next = entry->slots[idx];
     entry->slots[idx] = chunk;
     entry->taken++;
-    return 1;
+    return chunk;
 }
 
 map_t createMap(size_t mapSize) {

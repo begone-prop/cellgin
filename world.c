@@ -7,11 +7,11 @@ Vector2 getAbsoluteCellIndex(Vector2 chunkIdx, Vector2 cellIdx, size_t chunkSize
     Vector2 sign = VSIGN(chunkIdx);
 
     if(chunkIdx.x < 0) {
-        abso.x = -(chunkSize - cellIdx.x) + ((chunkIdx.x + 1) * 10);
+        abso.x = -((int)chunkSize - cellIdx.x) + ((chunkIdx.x + 1) * 10);
     } else abso.x = (cellIdx.x + sign.x) + ((chunkIdx.x - 1) * 10);
 
     if(chunkIdx.y < 0) {
-        abso.y = -(chunkSize - cellIdx.y) + ((chunkIdx.y + 1) * 10);
+        abso.y = -((int)chunkSize - cellIdx.y) + ((chunkIdx.y + 1) * 10);
     } else abso.y = (cellIdx.y + sign.y) + ((chunkIdx.y - 1) * 10);
     abso.y *= -1;
 
