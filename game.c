@@ -23,13 +23,8 @@ int main(int argc, char **argv) {
     static const size_t tick = 50;
 
     const size_t cellDens = 15;
-    const size_t cellSize = width / cellDens;
-
-    int state[chunkSize][chunkSize];
-
-    int newState[chunkSize][chunkSize];
-    zeroState(chunkSize, chunkSize, state);
-    zeroState(chunkSize, chunkSize, newState);
+    size_t cellSize = width / cellDens;
+    const size_t defCellSize = cellSize;
 
     Vector2 origin = screenCenter;
 
@@ -42,7 +37,7 @@ int main(int argc, char **argv) {
         .origin = origin,
         .cellSize = cellSize,
         .chunkSize = chunkSize,
-        .chunks = createMap(10)
+        .chunks = createMap(1024)
     };
 
     Vector2 mouse, prevMouse;
@@ -91,6 +86,7 @@ int main(int argc, char **argv) {
 
         if(IsKeyPressed(KEY_ZERO)) {
             board.origin = screenCenter;
+            board.cellSize = defCellSize;
         }
 
         if(IsKeyPressed(KEY_F)) {
@@ -119,16 +115,23 @@ int main(int argc, char **argv) {
             idx = getCellIndex(board, mouse);
             Vector2 chunkidx = getChunkIndex(idx, board.chunkSize);
             Vector2 rel = getRelativeCellIndex(idx, board.chunkSize);
+            Vector2 abso = getAbsoluteCellIndex(chunkidx, rel, board.chunkSize);
             /*animate = false;*/
 
             fprintf(stderr,
-                    "{x: %i, y: %i}: (x: %i, y: %i) [x: %i, y: %i]\n",
-                    (int)chunkidx.x, (int)chunkidx.y, (int)idx.x, (int)idx.y,
-                    (int)rel.x, (int)rel.y);
+                    "{x: %i, y: %i}: "
+                    "(x: %i, y: %i)"
+                    "[x: %i, y: %i]"
+                    "[x: %i, y: %i]\n",
+                    (int)chunkidx.x, (int)chunkidx.y,
+                    (int)idx.x, (int)idx.y,
+                    (int)rel.x, (int)rel.y,
+                    (int)abso.x, -(int)abso.y
+                    );
 
             chunk_t *found = insert(&board.chunks, chunkidx, board.chunkSize);
             if(found) {
-                //
+                updateChunk(found, rel, board.chunkSize);
             }
 
             if(VEDGE(rel, chunkSize)) {
@@ -143,34 +146,34 @@ int main(int argc, char **argv) {
         /*if(animate && !(frame % tick)) {*/
         /*}*/
 
-        /*for(size_t idx = 0; idx < board.chunks.size; idx++) {*/
-            /*if(!board.chunks.slots[idx]) continue;*/
-            /*for(chunk_t *current = board.chunks.slots[idx]; current; current = current->next) {*/
-                /*for(int i = 0; (size_t)i < board.chunkSize; i++) {*/
-                    /*for(int j = 0; (size_t)j < board.chunkSize; j++) {*/
-                        /*int live = current->state[i + board.chunkSize * j];*/
-                        /*Color prim = pal[live];*/
-                        /*Color sec = pal[!live];*/
-                        /*int x = (i + board.chunkSize * j) / board.chunkSize;*/
-                        /*int y = (i + board.chunkSize * j) % board.chunkSize;*/
-                        /*Vector2 abso = getAbsoluteCellIndex(current->index, (Vector2){x, y}, board.chunkSize);*/
-                        /*Vector2 pos = getCellPosition(board, abso);*/
+        for(size_t idx = 0; idx < board.chunks.size; idx++) {
+            if(!board.chunks.slots[idx]) continue;
+            for(chunk_t *current = board.chunks.slots[idx]; current; current = current->next) {
+                for(int i = 0; (size_t)i < board.chunkSize; i++) {
+                    for(int j = 0; (size_t)j < board.chunkSize; j++) {
+                        int live = current->state[i + board.chunkSize * j];
+                        Color prim = pal[live];
+                        Color sec = pal[!live];
+                        int x = (i + board.chunkSize * j) / board.chunkSize;
+                        int y = (i + board.chunkSize * j) % board.chunkSize;
+                        Vector2 abso = getAbsoluteCellIndex(current->index, (Vector2){x, y}, board.chunkSize);
+                        Vector2 pos = getCellPosition(board, abso);
 
-                        /*Rectangle rec = {*/
-                            /*.x = pos.x,*/
-                            /*.y = pos.y,*/
-                            /*.height = board.cellSize,*/
-                            /*.width = board.cellSize,*/
-                        /*};*/
+                        Rectangle rec = {
+                            .x = pos.x,
+                            .y = pos.y,
+                            .height = board.cellSize,
+                            .width = board.cellSize,
+                        };
 
-                        /*if(live) {*/
-                            /*DrawRectangleRec(rec, prim);*/
-                            /*DrawRectangleLinesEx(rec, 2.5f, sec);*/
-                        /*}*/
-                    /*}*/
-                /*}*/
-            /*}*/
-        /*}*/
+                        if(live) {
+                            DrawRectangleRec(rec, prim);
+                            DrawRectangleLinesEx(rec, 2.5f, sec);
+                        }
+                    }
+                }
+            }
+        }
 
         drawGrid(board);
 

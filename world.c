@@ -6,13 +6,15 @@ Vector2 getAbsoluteCellIndex(Vector2 chunkIdx, Vector2 cellIdx, size_t chunkSize
     Vector2 abso;
     Vector2 sign = VSIGN(chunkIdx);
 
+    abso.x = (cellIdx.x + sign.x) + ((chunkIdx.x - sign.x) * chunkSize);
     if(chunkIdx.x < 0) {
-        abso.x = -((int)chunkSize - cellIdx.x) + ((chunkIdx.x + 1) * 10);
-    } else abso.x = (cellIdx.x + sign.x) + ((chunkIdx.x - 1) * 10);
+        abso.x -= (int) chunkSize + sign.x;
+    }
 
+    abso.y = (cellIdx.y + sign.y) + ((chunkIdx.y - sign.y) * chunkSize);
     if(chunkIdx.y < 0) {
-        abso.y = -((int)chunkSize - cellIdx.y) + ((chunkIdx.y + 1) * 10);
-    } else abso.y = (cellIdx.y + sign.y) + ((chunkIdx.y - 1) * 10);
+        abso.y -= (int) chunkSize + sign.y;
+    }
     abso.y *= -1;
 
     return abso;

@@ -6,9 +6,9 @@ static void freeChunk(chunk_t *);
 void printChunkList(chunk_t *);
 static int resize(map_t *, float);
 
-int updateChunk(chunk_t *chunk, Vector2 cell) {
+int updateChunk(chunk_t *chunk, Vector2 cell, size_t chunkSize) {
     if(!chunk || !chunk->state) return 0;
-    chunk->state[abs((int)cell.y) + (10 * abs((int)cell.x))] ^= 1;
+    chunk->state[abs((int)cell.y) + (chunkSize * abs((int)cell.x))] ^= 1;
     return 1;
 }
 
