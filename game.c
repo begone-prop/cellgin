@@ -11,8 +11,6 @@
 #include "world.h"
 #include "hashmap.h"
 
-#define ON_EDGE(A)
-
 int main(int argc, char **argv) {
     (void) argc;
     (void) argv;
@@ -89,6 +87,10 @@ int main(int argc, char **argv) {
 
         if(IsKeyPressed(KEY_P)) {
             printMap(board.chunks);
+        }
+
+        if(IsKeyPressed(KEY_ZERO)) {
+            board.origin = screenCenter;
         }
 
         if(IsKeyPressed(KEY_F)) {
