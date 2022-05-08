@@ -92,10 +92,10 @@ int main(int argc, char **argv) {
             Vector2 chunkidx = getChunkIndex(board, idx);
             /*animate = false;*/
 
-            /*fprintf(stderr, "cell: (x: %i, y: %i) chunk: (x: %i, y: %i)\n",*/
-                    /*(int)idx.x, (int)idx.y, (int)chunkidx.x, (int)chunkidx.y);*/
+            fprintf(stderr, "{x: %i, y: %i}: (x: %i, y: %i)\n",
+                    (int)chunkidx.x, (int)chunkidx.y, (int)idx.x, (int)idx.y);
 
-            insert(&board.chunks, chunkidx, idx);
+            /*insert(&board.chunks, chunkidx, idx);*/
             /*if(idx.x > 0 && idx.y > 0 && idx.x <= 10 && idx.y <= 10)*/
                 /*state[(int)idx.x - 1][(int)idx.y - 1] ^= 1;*/
 
@@ -122,7 +122,7 @@ int main(int argc, char **argv) {
 
         prevMouse = mouse;
         frame = (frame + 1) % tick;
-        if(!(frame % tick)) fprintf(stderr, "dt: %f\r", GetFrameTime());
+        /*if(!(frame % tick)) fprintf(stderr, "dt: %f\r", GetFrameTime());*/
         EndDrawing();
     }
 

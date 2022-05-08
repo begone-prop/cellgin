@@ -5,8 +5,10 @@
 Vector2 getChunkIndex(board_t board, Vector2 cellIndex) {
     Vector2 chunkIndex;
     Vector2 sign = VSIGN(cellIndex);
-    chunkIndex.x = (int)(cellIndex.x / (board.chunkSize + 1)) + (int)sign.x;
-    chunkIndex.y = (int)(cellIndex.y / (board.chunkSize + 1)) + (int)sign.y;
+
+    chunkIndex.x = (int)((cellIndex.x - sign.x) / board.chunkSize) + sign.x;
+    chunkIndex.y = (int)((cellIndex.y - sign.y) / board.chunkSize) + sign.y;
+
     return chunkIndex;
 }
 
