@@ -3,9 +3,6 @@
 
 #include <stddef.h>
 
-#define WORLD_X 1000
-#define WORLD_Y 1000
-
 #define IS_BOUND(X, DX) ((DX) >= (X) || (DX) < 0)
 #define IS_NEIGHBOUR(X, Y, DX, DY) !((IS_BOUND((X), (DX))) || (IS_BOUND((Y), (DY))))
 
