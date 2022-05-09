@@ -3,16 +3,25 @@
 #include "world.h"
 
 static void freeChunk(chunk_t *);
-void printChunkList(chunk_t *);
+static void printChunkList(chunk_t *);
 static int resize(map_t *, float);
 
-int updateChunk(const chunk_t *chunk, Vector2 cell, size_t chunkSize, int value) {
+int updateChunk(chunk_t *chunk, Vector2 cell, size_t chunkSize, int value) {
     if(!chunk || !chunk->state) return 0;
-    chunk->state[abs((int)cell.y) + (chunkSize * abs((int)cell.x))] = value;
+    chunk->state[(int)cell.y + (chunkSize * (int)cell.x)] = value;
+
+    if(value == 0) {
+        int cond = (chunk->alive == 0);
+        chunk->alive = !cond * (chunk->alive - 1) + cond * 0;
+    } else {
+        chunk->alive++;
+    }
+
     return 1;
 }
 
 int getCellValue(const chunk_t *chunk, Vector2 cell, size_t chunkSize) {
+    if(!chunk || !chunk->state) return -1;
     return chunk->state[(int)cell.y + chunkSize * (int) cell.x];
 }
 
@@ -125,8 +134,6 @@ chunk_t *insert(map_t *entry, Vector2 chunkidx, size_t chunkSize) {
         fprintf(stderr, "Growing table\n");
         resize(entry, 2);
     }
-
-    if(chunkidx.x == 0 || chunkidx.y == 0) return 0;
 
     size_t idx = map((int)chunkidx.x, (int)chunkidx.y) % entry->size;
     chunk_t *update = search(entry->slots[idx], chunkidx);

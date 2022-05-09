@@ -2,6 +2,62 @@
 #include <stdio.h>
 #include "world.h"
 
+int checkEdge(board_t *board, const chunk_t *chunk) {
+
+    Vector2 sign = VSIGN(chunk->index);
+
+    for(int x = 0; x < board->chunkSize; x += board->chunkSize - 1) {
+        for(int y = 0; y < board->chunkSize; y++) {
+            if(chunk->state[x + board->chunkSize * y]) {
+
+                int cond = (x == 0);
+
+                if(EDGE(x, board->chunkSize)) {
+                    Vector2 corn = chunk->index;
+                    corn.x = (y == 0) * (chunk->index.x - 1) + (y != 0) * (chunk->index.x + 1);
+                    corn.x += (corn.x == 0) * -sign.x;
+                    corn.y = cond * (chunk->index.y - 1) + !cond * (chunk->index.y + 1);
+                    corn.y += (corn.y == 0) * -sign.y;
+
+                    insert(&board->chunks, corn, board->chunkSize);
+                } else {
+                    Vector2 newIdx = chunk->index;
+                    newIdx.y = cond * (chunk->index.y - 1) + !cond * (chunk->index.y + 1);
+                    newIdx.y += (newIdx.y == 0) * -sign.y;
+                    insert(&board->chunks, newIdx, board->chunkSize);
+                    break;
+                }
+            }
+        }
+    }
+
+    for(int y = 0; y < board->chunkSize; y += board->chunkSize - 1) {
+        for(int x = 0; x < board->chunkSize; x++) {
+            if(chunk->state[x + board->chunkSize * y]) {
+
+                int cond = (y == 0);
+
+                if(EDGE(x, board->chunkSize)) {
+                    Vector2 corn = chunk->index;
+                    corn.x = (y == 0) * (chunk->index.x - 1) + (y != 0) * (chunk->index.x + 1);
+                    corn.x += (corn.x == 0) * -sign.x;
+                    corn.y = cond * (chunk->index.y - 1) + !cond * (chunk->index.y + 1);
+                    corn.y += (corn.y == 0) * -sign.y;
+                    insert(&board->chunks, corn, board->chunkSize);
+                } else {
+                    Vector2 newIdx = chunk->index;
+                    newIdx.x = cond * (chunk->index.x - 1) + !cond * (chunk->index.x + 1);
+                    newIdx.x += (newIdx.x == 0) * -sign.x;
+                    insert(&board->chunks, newIdx, board->chunkSize);
+                    break;
+                }
+            }
+        }
+    }
+
+    return 1;
+}
+
 Vector2 getAbsoluteCellIndex(Vector2 chunkIdx, Vector2 cellIdx, size_t chunkSize) {
     Vector2 abso;
     Vector2 sign = VSIGN(chunkIdx);
@@ -15,8 +71,8 @@ Vector2 getAbsoluteCellIndex(Vector2 chunkIdx, Vector2 cellIdx, size_t chunkSize
     if(chunkIdx.y < 0) {
         abso.y -= (int) chunkSize + sign.y;
     }
-    abso.y *= -1;
 
+    abso.y *= -1;
     return abso;
 }
 
