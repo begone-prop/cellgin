@@ -42,7 +42,7 @@ int freeChunkList(chunk_t *);
 chunk_t *search(chunk_t *head, Vector2 index);
 chunk_t *insert(map_t *, Vector2, size_t);
 int deleteMap(map_t *);
-int updateChunk(chunk_t *, Vector2, size_t, int);
+int updateChunk(map_t *, chunk_t *, Vector2, size_t, int);
 int getCellValue(const chunk_t *, Vector2, size_t);
 void printMap(map_t);
 int drop(map_t *, Vector2);

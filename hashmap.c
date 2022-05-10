@@ -6,7 +6,7 @@ static void freeChunk(chunk_t *);
 static void printChunkList(chunk_t *);
 static int resize(map_t *, float);
 
-int updateChunk(chunk_t *chunk, Vector2 cell, size_t chunkSize, int value) {
+int updateChunk(map_t *hashmap, chunk_t *chunk, Vector2 cell, size_t chunkSize, int value) {
     if(!chunk || !chunk->state) return 0;
     chunk->state[(int)cell.y + (chunkSize * (int)cell.x)] = value;
 
@@ -14,6 +14,14 @@ int updateChunk(chunk_t *chunk, Vector2 cell, size_t chunkSize, int value) {
         int cond = (chunk->alive == 0);
         chunk->alive = !cond * (chunk->alive - 1) + cond * 0;
     } else {
+        if(!chunk->alive) {
+            Vector2 neighbours[8];
+            getChunkNeighbours(neighbours, 8, chunk->index);
+            for(short i = 0; i < 8; i++) {
+                insert(hashmap, neighbours[i], chunkSize);
+            }
+        }
+
         chunk->alive++;
     }
 

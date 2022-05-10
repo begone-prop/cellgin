@@ -132,30 +132,23 @@ int main(int argc, char **argv) {
             chunk_t *found = insert(&board.chunks, chunkidx, board.chunkSize);
             if(found) {
                 int val = getCellValue(found, rel, board.chunkSize);
-                updateChunk(found, rel, board.chunkSize, (val ^= 1));
-                /*size_t neigh = countNeighbours(board.chunks, found, board.chunkSize, rel);*/
-                /*fprintf(stderr, "Neighbour count: %zu\n", neigh);*/
+                updateChunk(&board.chunks, found, rel, board.chunkSize, (val ^= 1));
             }
-
-            /*if(VEDGE(rel, chunkSize)) {*/
-                /*fprintf(stderr, "Edge\n");*/
-            /*}*/
         }
 
+        /*if(animate && !(frame % tick)) {*/
+        /*}*/
 
         draw:
         BeginDrawing();
         ClearBackground(BLACK);
 
-        /*if(animate && !(frame % tick)) {*/
-        /*}*/
 
         for(size_t idx = 0; idx < board.chunks.size; idx++) {
             if(!board.chunks.slots[idx]) continue;
             for(chunk_t *current = board.chunks.slots[idx]; current; current = current->next) {
                 for(int i = 0; (size_t)i < board.chunkSize; i++) {
                     for(int j = 0; (size_t)j < board.chunkSize; j++) {
-                        /*if(current->alive) checkEdge(&board, current);*/
                         int live = current->state[i + board.chunkSize * j];
                         Color prim = pal[live];
                         Color sec = pal[!live];
@@ -180,7 +173,7 @@ int main(int argc, char **argv) {
             }
         }
 
-        /*drawGrid(board);*/
+        drawGrid(board);
 
         prevMouse = mouse;
         frame = (frame + 1) % tick;
