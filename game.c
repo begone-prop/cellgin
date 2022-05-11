@@ -133,10 +133,16 @@ int main(int argc, char **argv) {
 
             chunk_t *found = insert(&board.chunks, chunkidx, board.chunkSize);
             if(found) {
-                int val = getCellValue(found, rel, board.chunkSize);
+                int val = getCellValue_(found, rel, board.chunkSize);
                 updateChunk(&board.chunks, found, rel, board.chunkSize, (val ^= 1));
-                size_t alive = countNeighbours(board.chunks, found, board.chunkSize, rel);
-                fprintf(stderr, "Live neighbours %zu\n", alive);
+
+                Vector2 newn = {
+                    .x = rel.x - 1,
+                    .y = rel.y - 1
+                };
+
+                int val2 = getCellValue(board.chunks, found, newn, board.chunkSize);
+                fprintf(stderr, "Val: %i\n", val2);
             }
         }
 

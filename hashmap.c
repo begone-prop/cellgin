@@ -28,9 +28,51 @@ int updateChunk(map_t *hashmap, chunk_t *chunk, Vector2 cell, size_t chunkSize, 
     return 1;
 }
 
-int getCellValue(const chunk_t *chunk, Vector2 cell, size_t chunkSize) {
+int getCellValue_(const chunk_t *chunk, Vector2 cell, size_t chunkSize) {
     if(!chunk || !chunk->state) return -1;
     return chunk->state[(int)cell.y + chunkSize * (int) cell.x];
+}
+
+int getCellValue(map_t hashmap, const chunk_t *chunk, Vector2 cell, size_t chunkSize) {
+    if(!chunk || !chunk->state) return -1;
+    int value = -1;
+    Vector2 sign = VSIGN(chunk->index);
+    Vector2 chunkIndex = chunk->index;
+
+    fprintf(stderr, "Cell index: [x: %i, y: %i]\n", (int)cell.x, (int)cell.y);
+    int changed = 0;
+
+    if(cell.x < 0 || cell.x >= chunkSize) {
+        int cond = cell.x < 0;
+        int idx = abs((int)cell.x) % chunkSize;
+        cell.x = cond * (chunkSize - idx) + !cond * idx;
+        chunkIndex.x += (cond * -1 + !cond * 1);
+        chunkIndex.x += (chunkIndex.x == 0) * -sign.x;
+        changed = 1;
+    }
+
+    if(cell.y < 0 || cell.y >= chunkSize) {
+        int cond = cell.y < 0;
+        int idx = abs((int)cell.y) % chunkSize;
+        cell.y = cond * (chunkSize - idx) + !cond * idx;
+        chunkIndex.y += (cond * -1 + !cond * 1);
+        chunkIndex.y += (chunkIndex.y == 0) * -sign.y;
+        changed = 1;
+    }
+
+    fprintf(stderr, "{x: %i, y: %i}: [x: %i, y: %i],\n",
+            (int)chunkIndex.x, (int)chunkIndex.y,
+            (int)cell.x, (int)cell.y);
+
+    if(changed) {
+        chunk_t *sel = find(hashmap, chunkIndex);
+        if(sel) value = getCellValue_(sel, cell, chunkSize);
+        else value = 0;
+    } else {
+        value = getCellValue_(chunk, cell, chunkSize);
+    }
+
+    return value;
 }
 
 int resize(map_t *hashmap, float ammount) {
