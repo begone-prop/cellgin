@@ -17,20 +17,20 @@ int main(int argc, char **argv) {
     InitWindow(width, height, "Game of Life");
     bool animate = false;
 
-    size_t chunkSize = 32;
+    size_t chunkSize = 10;
     Color pal[] = {BLACK, WHITE};
     static const size_t tick = 50;
 
-    const size_t cellDens = 15;
+    const size_t cellDens = 20;
     size_t cellSize = width / cellDens;
     const size_t defCellSize = cellSize;
 
-    /*Vector2 origin = screenCenter;*/
+    Vector2 origin = screenCenter;
 
-    Vector2 origin = {
-        .x = cellSize,
-        .y = width - cellSize,
-    };
+    /*Vector2 origin = {*/
+        /*.x = cellSize,*/
+        /*.y = width - cellSize,*/
+    /*};*/
 
     board_t board = {
         .origin = origin,
@@ -95,12 +95,15 @@ int main(int argc, char **argv) {
             Vector2 rel = getRelativeCellIndex(idx, board.chunkSize);
             chunk_t *chunk = find(board.chunks, chunkidx);
             if(chunk) {
-                oneState(chunk->state, board.chunkSize);
-                chunk->alive = chunkSize * chunkSize;
+                for(int x = 0; x < board.chunkSize; x++) {
+                    for(int y = 0; y < board.chunkSize; y++) {
+                        updateChunk(&board.chunks, chunk, (Vector2){x, y}, board.chunkSize, 1);
+                    }
+                }
             }
         }
 
-        if(IsKeyPressed(KEY_Z)) {
+        if(IsKeyDown(KEY_Z)) {
             Vector2 idx = getCellIndex(board, mouse);
             Vector2 chunkidx = getChunkIndex(idx, board.chunkSize);
             Vector2 rel = getRelativeCellIndex(idx, board.chunkSize);
@@ -121,12 +124,10 @@ int main(int argc, char **argv) {
             fprintf(stderr,
                     "{x: %i, y: %i}: "
                     "(x: %i, y: %i)"
-                    "[x: %i, y: %i]"
                     "[x: %i, y: %i]\n",
                     (int)chunkidx.x, (int)chunkidx.y,
                     (int)idx.x, (int)idx.y,
-                    (int)rel.x, (int)rel.y,
-                    (int)abso.x, -(int)abso.y
+                    (int)rel.x, (int)rel.y
                     );
 
             chunk_t *found = insert(&board.chunks, chunkidx, board.chunkSize);

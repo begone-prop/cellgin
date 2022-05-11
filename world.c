@@ -11,7 +11,7 @@ int getChunkNeighbours(Vector2 *neigh, size_t neighSize, Vector2 index) {
     for(int i = -1; i <= 1; i++) {
         for(int j = -1; j <= 1; j++) {
             if(i == 0 && j == 0) continue;
-            Vector2 newn = { index.x + i, index.x + j };
+            Vector2 newn = { index.x + i, index.y + j };
             newn.x += (newn.x == 0) * -sign.x;
             newn.y += (newn.y == 0) * -sign.y;
             neigh[size++] = newn;
