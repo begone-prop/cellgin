@@ -193,14 +193,12 @@ int main(int argc, char **argv) {
                 if(!board.chunks.slots[idx]) continue;
                 for(chunk_t *current = board.chunks.slots[idx]; current; current = current->next) {
                     int *tmp = current->state;
-                    size_t stmp = current->alive;
                     current->state = current->nextState;
                     current->nextState = tmp;
                     current->alive = current->newAlive;
-                    current->newAlive = stmp;
 
                     memset(current->nextState, 0, board.chunkSize * board.chunkSize);
-                    /*current->newAlive = 0;*/
+                    current->newAlive = 0;
                 }
             }
 
