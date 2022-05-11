@@ -6,23 +6,29 @@ static void freeChunk(chunk_t *);
 static void printChunkList(chunk_t *);
 static int resize(map_t *, float);
 
-int updateChunk(map_t *hashmap, chunk_t *chunk, Vector2 cell, size_t chunkSize, int value) {
-    if(!chunk || !chunk->state) return 0;
-    chunk->state[(int)cell.y + (chunkSize * (int)cell.x)] = value;
+int updateChunk(map_t *hashmap, chunk_t *chunk, Vector2 cell, size_t chunkSize, int value, int which) {
+
+    int updateNext = (which > 0);
+
+    int *wstate =  updateNext ? chunk->nextState : chunk->state;
+    size_t *alive = updateNext ? &chunk->newAlive : &chunk->alive;
+
+    if(!chunk || !wstate) return 0;
+    wstate[(int)cell.y + (chunkSize * (int)cell.x)] = value;
+
 
     if(value == 0) {
-        int cond = (chunk->alive == 0);
-        chunk->alive = !cond * (chunk->alive - 1) + cond * 0;
+        int cond = (*alive == 0);
+        *alive = !cond * (*alive - 1) + cond * 0;
     } else {
-        if(!chunk->alive) {
+        if(*alive == 0) {
             Vector2 neighbours[8];
             getChunkNeighbours(neighbours, 8, chunk->index);
-            for(short i = 0; i < 8; i++) {
+            for(short i = 0; i < 8; i++)
                 insert(hashmap, neighbours[i], chunkSize);
-            }
         }
 
-        chunk->alive++;
+        *alive += *alive < (chunkSize * chunkSize);
     }
 
     return 1;
@@ -213,6 +219,7 @@ chunk_t *createChunk(Vector2 index, size_t chunkSize) {
     chunk_t *newChunk = malloc(sizeof(chunk_t));
     newChunk->index = index;
     newChunk->alive = 0;
+    newChunk->newAlive = 0;
     newChunk->state = calloc(chunkSize * chunkSize, sizeof(int));
     newChunk->nextState = calloc(chunkSize * chunkSize, sizeof(int));
 

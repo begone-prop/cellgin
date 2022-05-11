@@ -70,13 +70,15 @@ int main(int argc, char **argv) {
             Vector2 chunkidx = getChunkIndex(idx, board.chunkSize);
 
             chunk_t *chosen = find(board.chunks, chunkidx);
+
+
             if(chosen) {
-                /*for(size_t i = 0; i < board.chunkSize; i++) {*/
-                    /*for(size_t j = 0; j < board.chunkSize; j++) {*/
-                        /*fprintf(stderr, "%i%s", chosen->state[i + board.chunkSize * j],*/
-                                /*j == board.chunkSize -1 ? "\n" : "");*/
-                    /*}*/
-                /*}*/
+                for(int x = 0; x < board.chunkSize; x++) {
+                    for(int y = 0; y < board.chunkSize; y++) {
+                        fprintf(stderr, "%i", getCellValue_(chosen, (Vector2){x, y}, board.chunkSize));
+                    }
+                    fprintf(stderr, "\n");
+                }
                 fprintf(stderr, "Alive: %zu\n", chosen->alive);
             }
         }
@@ -98,7 +100,7 @@ int main(int argc, char **argv) {
             if(chunk) {
                 for(int x = 0; x < board.chunkSize; x++) {
                     for(int y = 0; y < board.chunkSize; y++) {
-                        updateChunk(&board.chunks, chunk, (Vector2){x, y}, board.chunkSize, 1);
+                        updateChunk(&board.chunks, chunk, (Vector2){x, y}, board.chunkSize, 1, 0);
                     }
                 }
             }
@@ -120,7 +122,7 @@ int main(int argc, char **argv) {
             Vector2 chunkidx = getChunkIndex(idx, board.chunkSize);
             Vector2 rel = getRelativeCellIndex(idx, board.chunkSize);
             Vector2 abso = getAbsoluteCellIndex(chunkidx, rel, board.chunkSize);
-            /*animate = false;*/
+            animate = false;
 
             fprintf(stderr,
                     "{x: %i, y: %i}: "
@@ -134,15 +136,7 @@ int main(int argc, char **argv) {
             chunk_t *found = insert(&board.chunks, chunkidx, board.chunkSize);
             if(found) {
                 int val = getCellValue_(found, rel, board.chunkSize);
-                updateChunk(&board.chunks, found, rel, board.chunkSize, (val ^= 1));
-
-                Vector2 newn = {
-                    .x = rel.x,
-                    .y = rel.y
-                };
-
-                size_t alive = countNeighbours(board.chunks, found, board.chunkSize, newn);
-                fprintf(stderr, "Live neighbours: %zu\n", alive);
+                updateChunk(&board.chunks, found, rel, board.chunkSize, (val ^= 1), 0);
             }
         }
 
@@ -181,7 +175,7 @@ int main(int argc, char **argv) {
             }
         }
 
-        /*drawGrid(board);*/
+        drawGrid(board);
 
         prevMouse = mouse;
         frame = (frame + 1) % tick;
@@ -199,9 +193,14 @@ int main(int argc, char **argv) {
                 if(!board.chunks.slots[idx]) continue;
                 for(chunk_t *current = board.chunks.slots[idx]; current; current = current->next) {
                     int *tmp = current->state;
+                    size_t stmp = current->alive;
                     current->state = current->nextState;
                     current->nextState = tmp;
+                    current->alive = current->newAlive;
+                    current->newAlive = stmp;
+
                     memset(current->nextState, 0, board.chunkSize * board.chunkSize);
+                    /*current->newAlive = 0;*/
                 }
             }
 
