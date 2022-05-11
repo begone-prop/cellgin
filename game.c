@@ -2,6 +2,7 @@
 
 #include <stdio.h>
 #include <math.h>
+#include <string.h>
 #include <stdbool.h>
 #include <stdlib.h>
 #include <raylib.h>
@@ -109,7 +110,7 @@ int main(int argc, char **argv) {
             Vector2 rel = getRelativeCellIndex(idx, board.chunkSize);
             chunk_t *chunk = find(board.chunks, chunkidx);
             if(chunk) {
-                zeroState(chunk->state, board.chunkSize);
+                memset(chunk->state, 0, chunkSize * chunkSize * sizeof(int));
                 chunk->alive = 0;
             }
         }
@@ -134,6 +135,8 @@ int main(int argc, char **argv) {
             if(found) {
                 int val = getCellValue(found, rel, board.chunkSize);
                 updateChunk(&board.chunks, found, rel, board.chunkSize, (val ^= 1));
+                size_t alive = countNeighbours(board.chunks, found, board.chunkSize, rel);
+                fprintf(stderr, "Live neighbours %zu\n", alive);
             }
         }
 
