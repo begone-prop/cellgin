@@ -137,17 +137,15 @@ int main(int argc, char **argv) {
                 updateChunk(&board.chunks, found, rel, board.chunkSize, (val ^= 1));
 
                 Vector2 newn = {
-                    .x = rel.x - 1,
-                    .y = rel.y - 1
+                    .x = rel.x,
+                    .y = rel.y
                 };
 
-                int val2 = getCellValue(board.chunks, found, newn, board.chunkSize);
-                fprintf(stderr, "Val: %i\n", val2);
+                size_t alive = countNeighbours(board.chunks, found, board.chunkSize, newn);
+                fprintf(stderr, "Live neighbours: %zu\n", alive);
             }
         }
 
-        /*if(animate && !(frame % tick)) {*/
-        /*}*/
 
         draw:
         BeginDrawing();
@@ -183,11 +181,31 @@ int main(int argc, char **argv) {
             }
         }
 
-        drawGrid(board);
+        /*drawGrid(board);*/
 
         prevMouse = mouse;
         frame = (frame + 1) % tick;
         if(!(frame % tick)) fprintf(stderr, "dt: %f\r", GetFrameTime());
+
+        if(animate && !(frame % tick)) {
+            for(size_t idx = 0; idx < board.chunks.size; idx++) {
+                if(!board.chunks.slots[idx]) continue;
+                for(chunk_t *current = board.chunks.slots[idx]; current; current = current->next) {
+                    nextGeneration(&board.chunks, current, board.chunkSize);
+                }
+            }
+
+            for(size_t idx = 0; idx < board.chunks.size; idx++) {
+                if(!board.chunks.slots[idx]) continue;
+                for(chunk_t *current = board.chunks.slots[idx]; current; current = current->next) {
+                    int *tmp = current->state;
+                    current->state = current->nextState;
+                    current->nextState = tmp;
+                    memset(current->nextState, 0, board.chunkSize * board.chunkSize);
+                }
+            }
+
+        }
         EndDrawing();
     }
 

@@ -39,7 +39,6 @@ int getCellValue(map_t hashmap, const chunk_t *chunk, Vector2 cell, size_t chunk
     Vector2 sign = VSIGN(chunk->index);
     Vector2 chunkIndex = chunk->index;
 
-    fprintf(stderr, "Cell index: [x: %i, y: %i]\n", (int)cell.x, (int)cell.y);
     int changed = 0;
 
     if(cell.x < 0 || cell.x >= chunkSize) {
@@ -59,10 +58,6 @@ int getCellValue(map_t hashmap, const chunk_t *chunk, Vector2 cell, size_t chunk
         chunkIndex.y += (chunkIndex.y == 0) * -sign.y;
         changed = 1;
     }
-
-    fprintf(stderr, "{x: %i, y: %i}: [x: %i, y: %i],\n",
-            (int)chunkIndex.x, (int)chunkIndex.y,
-            (int)cell.x, (int)cell.y);
 
     if(changed) {
         chunk_t *sel = find(hashmap, chunkIndex);
@@ -121,6 +116,7 @@ void printMap(map_t hashmap) {
 
 static void freeChunk(chunk_t *chunk) {
     free(chunk->state);
+    free(chunk->nextState);
     free(chunk);
     chunk = NULL;
 }
@@ -166,6 +162,7 @@ int drop(map_t *hashmap, Vector2 chunkIdx) {
             chunk_t *next = current->next;
             if(next && (chunkIdx.x == next->index.x && chunkIdx.y == next->index.y)) {
                 free(next->state);
+                free(next->nextState);
                 current->next = next->next;
                 free(next);
                 hashmap->taken--;
@@ -217,6 +214,7 @@ chunk_t *createChunk(Vector2 index, size_t chunkSize) {
     newChunk->index = index;
     newChunk->alive = 0;
     newChunk->state = calloc(chunkSize * chunkSize, sizeof(int));
+    newChunk->nextState = calloc(chunkSize * chunkSize, sizeof(int));
 
     if(!newChunk->state) {
         newChunk->index.x = 0;

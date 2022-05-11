@@ -25,7 +25,9 @@
 typedef struct chunk_t {
     Vector2 index;
     int *state;
+    int *nextState;
     size_t alive;
+    size_t newAlive;
     struct chunk_t *next;
 } chunk_t;
 
