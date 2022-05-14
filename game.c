@@ -73,8 +73,8 @@ int main(int argc, char **argv) {
 
 
             if(chosen) {
-                for(int x = 0; x < board.chunkSize; x++) {
-                    for(int y = 0; y < board.chunkSize; y++) {
+                for(size_t x = 0; x < board.chunkSize; x++) {
+                    for(size_t y = 0; y < board.chunkSize; y++) {
                         fprintf(stderr, "%i", getCellValue_(chosen, (Vector2){x, y}, board.chunkSize));
                     }
                     fprintf(stderr, "\n");
@@ -95,11 +95,10 @@ int main(int argc, char **argv) {
         if(IsKeyDown(KEY_F)) {
             Vector2 idx = getCellIndex(board, mouse);
             Vector2 chunkidx = getChunkIndex(idx, board.chunkSize);
-            Vector2 rel = getRelativeCellIndex(idx, board.chunkSize);
             chunk_t *chunk = find(board.chunks, chunkidx);
             if(chunk) {
-                for(int x = 0; x < board.chunkSize; x++) {
-                    for(int y = 0; y < board.chunkSize; y++) {
+                for(size_t x = 0; x < board.chunkSize; x++) {
+                    for(size_t y = 0; y < board.chunkSize; y++) {
                         updateChunk(&board.chunks, chunk, (Vector2){x, y}, board.chunkSize, 1, 0);
                     }
                 }
@@ -109,7 +108,6 @@ int main(int argc, char **argv) {
         if(IsKeyDown(KEY_Z)) {
             Vector2 idx = getCellIndex(board, mouse);
             Vector2 chunkidx = getChunkIndex(idx, board.chunkSize);
-            Vector2 rel = getRelativeCellIndex(idx, board.chunkSize);
             chunk_t *chunk = find(board.chunks, chunkidx);
             if(chunk) {
                 memset(chunk->state, 0, chunkSize * chunkSize * sizeof(int));
@@ -121,7 +119,6 @@ int main(int argc, char **argv) {
             idx = getCellIndex(board, mouse);
             Vector2 chunkidx = getChunkIndex(idx, board.chunkSize);
             Vector2 rel = getRelativeCellIndex(idx, board.chunkSize);
-            Vector2 abso = getAbsoluteCellIndex(chunkidx, rel, board.chunkSize);
             animate = false;
 
             fprintf(stderr,
@@ -139,7 +136,6 @@ int main(int argc, char **argv) {
                 updateChunk(&board.chunks, found, rel, board.chunkSize, (val ^= 1), 0);
             }
         }
-
 
         draw:
         BeginDrawing();
