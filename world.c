@@ -85,6 +85,18 @@ Vector2 getCellIndex(board_t board, Vector2 offset) {
     return index;
 }
 
+Vector2 getChunkPosition(board_t board, Vector2 index) {
+    Vector2 cord;
+    Vector2 sign = VSIGN(index);
+
+    size_t size = board.chunkSize * board.cellSize;
+    cord.x = index.x * size + board.origin.x - (index.x > 0) * size;
+    cord.y = ((index.y * -sign.y) * size + (board.origin.y * sign.y) +
+            (sign.y < 0) * size) * sign.y;
+
+    return cord;
+}
+
 Vector2 getCellPosition(board_t board, Vector2 index) {
     float size = (float) board.cellSize;
     Vector2 cord;

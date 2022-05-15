@@ -1,5 +1,3 @@
-#define _DEFAULT_SOURCE
-
 #include <stdio.h>
 #include <math.h>
 #include <string.h>
@@ -119,8 +117,10 @@ int main(int argc, char **argv) {
             idx = getCellIndex(board, mouse);
             Vector2 chunkidx = getChunkIndex(idx, board.chunkSize);
             Vector2 rel = getRelativeCellIndex(idx, board.chunkSize);
+            Vector2 chunkPos = getChunkPosition(board, chunkidx);
             animate = false;
 
+            fprintf(stderr, "x: %i, y: %i\n", (int)mouse.x, (int)mouse.y);
             fprintf(stderr,
                     "{x: %i, y: %i}: "
                     "(x: %i, y: %i)"
@@ -145,6 +145,10 @@ int main(int argc, char **argv) {
         for(size_t idx = 0; idx < board.chunks.size; idx++) {
             if(!board.chunks.slots[idx]) continue;
             for(chunk_t *current = board.chunks.slots[idx]; current; current = current->next) {
+                Vector2 rect = getChunkPosition(board, current->index);
+                size_t size = board.chunkSize * board.cellSize;
+                Color allocChunk = ColorAlpha(GREEN, 0.4f);
+                DrawRectangleV(rect, (Vector2){size, size}, allocChunk);
                 for(int i = 0; (size_t)i < board.chunkSize; i++) {
                     for(int j = 0; (size_t)j < board.chunkSize; j++) {
                         int live = current->state[i + board.chunkSize * j];
@@ -175,7 +179,7 @@ int main(int argc, char **argv) {
 
         prevMouse = mouse;
         frame = (frame + 1) % tick;
-        if(!(frame % tick)) fprintf(stderr, "dt: %f\r", GetFrameTime());
+        if(!(frame % tick)) fprintf(stderr, "dt: %f (%6i FPS)\r", GetFrameTime(), GetFPS());
 
         if(animate && !(frame % tick)) {
             for(size_t idx = 0; idx < board.chunks.size; idx++) {

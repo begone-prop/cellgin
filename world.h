@@ -1,6 +1,8 @@
 #ifndef WORLD_H_
 #define WORLD_H_
 
+#define _DEFAULT_SOURCE
+
 #include <raymath.h>
 #include <stddef.h>
 #include "hashmap.h"
@@ -28,6 +30,7 @@ typedef struct board_t {
 void drawGrid(board_t);
 Vector2 getCellIndex(board_t, Vector2);
 Vector2 getCellPosition(board_t, Vector2);
+Vector2 getChunkPosition(board_t, Vector2);
 Vector2 getChunkIndex(Vector2, size_t);
 Vector2 getRelativeCellIndex(Vector2, size_t);
 Vector2 getAbsoluteCellIndex(Vector2, Vector2, size_t);
