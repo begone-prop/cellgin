@@ -21,15 +21,11 @@ void nextGeneration(map_t *hashmap, chunk_t *chunk, size_t chunkSize) {
             int cellState = getCellValue_(chunk, index, chunkSize);
             size_t alive = countNeighbours(*hashmap, chunk, chunkSize, index);
             if(cellState) {
-                /*if(alive == 2 || alive == 3) chunk->nextState[(int)index.y + chunkSize * (int)index.x] = 1;*/
-                /*else chunk->nextState[(int)index.y + chunkSize * (int)index.x] = 0;*/
-                if(alive == 2 || alive == 3) updateChunk(hashmap, chunk, index, chunkSize, 1, 1);
-                else updateChunk(hashmap, chunk, index, chunkSize, 0, 1);
+                int value = (alive == 2 || alive == 3);
+                updateChunk(hashmap, chunk, index, chunkSize, value, 1);
             } else {
-                /*if(alive == 3) chunk->nextState[(int)index.y + chunkSize * (int)index.x] = 1;*/
-                /*else chunk->nextState[(int)index.y + chunkSize * (int)index.x] = 0;*/
-                if(alive == 3) updateChunk(hashmap, chunk, index, chunkSize, 1, 1);
-                else updateChunk(hashmap, chunk, index, chunkSize, 0, 1);
+                int value = (alive == 3);
+                updateChunk(hashmap, chunk, index, chunkSize, value, 1);
             }
         }
     }
