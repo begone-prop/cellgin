@@ -28,6 +28,7 @@ int updateChunk(map_t *hashmap, chunk_t *chunk, Vector2 cell, size_t chunkSize, 
                 insert(hashmap, neighbours[i], chunkSize);
         }
 
+        chunk->timeToLive = TIME_TO_LIVE;
         *alive += *alive < (chunkSize * chunkSize);
     }
 
@@ -149,7 +150,7 @@ int deleteMap(map_t * hashmap) {
 int drop(map_t *hashmap, Vector2 chunkIdx) {
 
     if((float) hashmap->taken / hashmap->size < SHRINK_THRESHOLD &&
-            hashmap->size >= MIN_SIZE) {
+            hashmap->size > MIN_SIZE) {
         fprintf(stderr, "Shrinking table\n");
         resize(hashmap, 0.5);
     }
@@ -220,6 +221,7 @@ chunk_t *createChunk(Vector2 index, size_t chunkSize) {
     newChunk->index = index;
     newChunk->alive = 0;
     newChunk->newAlive = 0;
+    newChunk->timeToLive = TIME_TO_LIVE;
     newChunk->state = calloc(chunkSize * chunkSize, sizeof(int));
     newChunk->nextState = calloc(chunkSize * chunkSize, sizeof(int));
 

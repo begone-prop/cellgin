@@ -10,11 +10,15 @@
 #endif
 
 #ifndef MIN_SIZE
-#define MIN_SIZE 8
+#define MIN_SIZE 1024
 #endif
 
 #ifndef MAX_SIZE
 #define MAX_SIZE 8192
+#endif
+
+#ifndef TIME_TO_LIVE
+#define TIME_TO_LIVE 250
 #endif
 
 #include <stdint.h>
@@ -28,6 +32,7 @@ typedef struct chunk_t {
     int *nextState;
     size_t alive;
     size_t newAlive;
+    size_t timeToLive;
     struct chunk_t *next;
 } chunk_t;
 

@@ -202,7 +202,27 @@ int main(int argc, char **argv) {
                 }
             }
 
+
+            for(size_t idx = 0; idx < board.chunks.size; idx++) {
+                if(!board.chunks.slots[idx]) continue;
+                for(chunk_t *current = board.chunks.slots[idx]; current; current = current->next) {
+                    Vector2 neighbours[8];
+                    size_t total = 0;
+                    getChunkNeighbours(neighbours, 8, current->index);
+                    for(short i = 0; i < 8; i++) {
+                        chunk_t *neigh = find(board.chunks, neighbours[i]);
+                        if(neigh) total += neigh->alive;
+                    }
+
+                    if(total == 0) {
+                        if(!current->timeToLive) {
+                        drop(&board.chunks, current->index);
+                        } else current->timeToLive--;
+                    }
+                }
+            }
         }
+
         EndDrawing();
     }
 
