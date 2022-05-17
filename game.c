@@ -199,13 +199,7 @@ int main(int argc, char **argv) {
 
                     memset(current->nextState, 0, board.chunkSize * board.chunkSize);
                     current->newAlive = 0;
-                }
-            }
 
-
-            for(size_t idx = 0; idx < board.chunks.size; idx++) {
-                if(!board.chunks.slots[idx]) continue;
-                for(chunk_t *current = board.chunks.slots[idx]; current; current = current->next) {
                     Vector2 neighbours[8];
                     size_t total = 0;
                     getChunkNeighbours(neighbours, 8, current->index);
