@@ -11,6 +11,7 @@
 #define VSIGN(A) {.x = SIGN((A.x)), .y = SIGN((A.y))}
 #define EDGE(A, B) (((A) == 0) || (A) == (B) - 1)
 #define VEDGE(A, B) (EDGE((A.x), (B)) || EDGE((A.y), (B)))
+#define V2EQ(A, B) (((A.x) == (B.x)) && ((A.y) == (B.y)))
 
 static const int width = 1000;
 static const int height = 1000;
