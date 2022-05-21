@@ -109,18 +109,19 @@ void drawGrid(board_t board) {
 
     float size = (float) board.cellSize;
 
-    float deltax = remainderf(board.origin.x, size);
-    float deltay = remainderf(board.origin.y, size);
+    int deltax = (int)board.origin.x % (int)size;
+    int deltay = (int)board.origin.y % (int)size;
 
-    for(float off = -size; off < width + size; off += size) {
+    for(int off = -size; off < width + size; off += size) {
         int cond = (off + deltax) == board.origin.x;
+
         DrawLineEx(
                 (Vector2){off + deltax, 0},
                 (Vector2){off + deltax, height},
                 cond * 3.0F + !cond * 1, WHITE);
     }
 
-    for(float off = -size; off < height + size; off += size) {
+    for(int off = -size; off < height + size; off += size) {
         int cond = (off + deltay) == board.origin.y;
         DrawLineEx(
                 (Vector2){0, off + deltay},
