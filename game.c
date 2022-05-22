@@ -20,7 +20,6 @@ int main(int argc, char **argv) {
     SetTargetFPS(120);
 
     size_t chunkSize = 10;
-    Color pal[] = {BLACK, WHITE};
     size_t tick = 15;
 
     const size_t cellDens = 20;
