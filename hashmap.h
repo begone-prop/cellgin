@@ -14,7 +14,7 @@
 #endif
 
 #ifndef MAX_SIZE
-#define MAX_SIZE 8192
+#define MAX_SIZE 65536
 #endif
 
 #ifndef TIME_TO_LIVE
