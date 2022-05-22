@@ -107,7 +107,11 @@ Vector2 getCellPosition(board_t board, Vector2 index) {
 
 void drawGrid(board_t board) {
 
-    float size = (float) board.cellSize;
+    long size = board.cellSize;
+
+    if((width / board.cellSize) > 75) {
+        size *= board.chunkSize;
+    }
 
     int deltax = (int)board.origin.x % (int)size;
     int deltay = (int)board.origin.y % (int)size;

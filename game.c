@@ -13,12 +13,15 @@ int main(int argc, char **argv) {
     (void) argc;
     (void) argv;
 
+    unsigned long long generation = 0;
+
     InitWindow(width, height, "Game of Life");
     bool animate = false;
+    SetTargetFPS(120);
 
     size_t chunkSize = 10;
     Color pal[] = {BLACK, WHITE};
-    static const size_t tick = 50;
+    size_t tick = 15;
 
     const size_t cellDens = 20;
     size_t cellSize = width / cellDens;
@@ -49,8 +52,11 @@ int main(int argc, char **argv) {
         mouse = GetMousePosition();
 
         float scale = GetMouseWheelMove();
-        if(scale != 0.0F) {
-            board.cellSize += (int)scale;
+        if(scale != 0.0f) {
+            if(board.cellSize <= 1) {
+                if(scale > 0) board.cellSize += scale;
+                else board.cellSize = 1;
+            } else board.cellSize += (int)scale;
         }
 
         if(IsMouseButtonDown(MOUSE_MIDDLE_BUTTON)) {
@@ -60,6 +66,14 @@ int main(int argc, char **argv) {
 
         if(IsKeyPressed(KEY_SPACE)) {
             animate ^= 1;
+        }
+
+        if(IsKeyPressed(KEY_UP)) {
+            if(tick > 1) tick--;
+        }
+
+        if(IsKeyPressed(KEY_DOWN)) {
+            tick++;
         }
 
         if(IsMouseButtonPressed(MOUSE_RIGHT_BUTTON)) {
@@ -168,7 +182,7 @@ int main(int argc, char **argv) {
 
                         if(live) {
                             DrawRectangleRec(rec, prim);
-                            DrawRectangleLinesEx(rec, 2.5f, sec);
+                            /*DrawRectangleLinesEx(rec, 2.5f, sec);*/
                         }
                     }
                 }
@@ -179,7 +193,8 @@ int main(int argc, char **argv) {
 
         prevMouse = mouse;
         frame = (frame + 1) % tick;
-        if(!(frame % tick)) fprintf(stderr, "dt: %f (%6i FPS)\r", GetFrameTime(), GetFPS());
+        if(!(frame % tick)) fprintf(stderr, "dt: %f (%6i FPS) generation: %-llu\r",
+                GetFrameTime(), GetFPS(), generation);
 
         if(animate && !(frame % tick)) {
             for(size_t idx = 0; idx < board.chunks.size; idx++) {
@@ -215,6 +230,8 @@ int main(int argc, char **argv) {
                     }
                 }
             }
+
+            generation++;
         }
 
         EndDrawing();

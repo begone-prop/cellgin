@@ -108,12 +108,12 @@ void printChunkList(chunk_t *head) {
 
 void printMap(map_t hashmap) {
     fprintf(stderr, "####\n");
-    for(size_t j = 0; j < hashmap.size; j++) {
-        if(hashmap.slots[j]) {
-            fprintf(stderr, "[%02zu]:\t", j);
-            printChunkList(hashmap.slots[j]);
-        }
-    }
+    /*for(size_t j = 0; j < hashmap.size; j++) {*/
+        /*if(hashmap.slots[j]) {*/
+            /*fprintf(stderr, "[%02zu]:\t", j);*/
+            /*printChunkList(hashmap.slots[j]);*/
+        /*}*/
+    /*}*/
 
     fprintf(stderr, "Size: %zu Items: %zu Load: %0.2f\n", hashmap.size,
             hashmap.taken,
