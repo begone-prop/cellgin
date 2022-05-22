@@ -155,40 +155,7 @@ int main(int argc, char **argv) {
         BeginDrawing();
         ClearBackground(BLACK);
 
-
-        for(size_t idx = 0; idx < board.chunks.size; idx++) {
-            if(!board.chunks.slots[idx]) continue;
-            for(chunk_t *current = board.chunks.slots[idx]; current; current = current->next) {
-                Vector2 rect = getChunkPosition(board, current->index);
-                size_t size = board.chunkSize * board.cellSize;
-                Color allocChunk = ColorAlpha(GREEN, 0.4f);
-                DrawRectangleV(rect, (Vector2){size, size}, allocChunk);
-                for(int i = 0; (size_t)i < board.chunkSize; i++) {
-                    for(int j = 0; (size_t)j < board.chunkSize; j++) {
-                        int live = current->state[i + board.chunkSize * j];
-                        Color prim = pal[live];
-                        Color sec = pal[!live];
-                        int x = (i + board.chunkSize * j) / board.chunkSize;
-                        int y = (i + board.chunkSize * j) % board.chunkSize;
-                        Vector2 abso = getAbsoluteCellIndex(current->index, (Vector2){x, y}, board.chunkSize);
-                        Vector2 pos = getCellPosition(board, abso);
-
-                        Rectangle rec = {
-                            .x = pos.x,
-                            .y = pos.y,
-                            .height = board.cellSize,
-                            .width = board.cellSize,
-                        };
-
-                        if(live) {
-                            DrawRectangleRec(rec, prim);
-                            /*DrawRectangleLinesEx(rec, 2.5f, sec);*/
-                        }
-                    }
-                }
-            }
-        }
-
+        drawCells(board);
         drawGrid(board);
 
         prevMouse = mouse;
@@ -224,9 +191,10 @@ int main(int argc, char **argv) {
                     }
 
                     if(total == 0) {
-                        if(!current->timeToLive) {
-                        drop(&board.chunks, current->index);
-                        } else current->timeToLive--;
+                        if(current->timeToLive == 0)
+                            drop(&board.chunks, current->index);
+
+                        else current->timeToLive--;
                     }
                 }
             }

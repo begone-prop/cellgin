@@ -16,7 +16,6 @@ int updateChunk(map_t *hashmap, chunk_t *chunk, Vector2 cell, size_t chunkSize, 
     if(!chunk || !wstate) return 0;
     wstate[(int)cell.y + (chunkSize * (int)cell.x)] = value;
 
-
     if(value == 0) {
         int cond = (*alive == 0);
         *alive = !cond * (*alive - 1) + cond * 0;

@@ -29,6 +29,7 @@ typedef struct board_t {
 } board_t;
 
 void drawGrid(board_t);
+void drawCells(board_t);
 Vector2 getCellIndex(board_t, Vector2);
 Vector2 getCellPosition(board_t, Vector2);
 Vector2 getChunkPosition(board_t, Vector2);
