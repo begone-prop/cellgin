@@ -1,5 +1,6 @@
 CC=gcc
-CFLAGS=-Wall -Wextra -std=c99 -Wpedantic -flto -O2
+CFLAGS=-Wall -Wextra -std=c99 -Wpedantic
+#-flto -O2
 CLIBS=-lraylib -lm
 
 OBJ=sim.o game.o world.o hashmap.o

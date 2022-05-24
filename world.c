@@ -108,14 +108,12 @@ Vector2 getChunkIndex(Vector2 cellIndex, size_t chunkSize) {
 
 Vector2 getCellIndex(board_t board, Vector2 offset) {
     Vector2 index;
-    float size = (float) board.cellSize;
 
     Vector2 delta = Vector2Subtract(offset, board.origin);
-
     Vector2 sign = VSIGN(delta);
 
-    index.x = (int)(delta.x / size) + (int)sign.x;
-    index.y = (int)(delta.y / size) + (int)sign.y;
+    index.x = (int)(delta.x / board.cellSize) + sign.x;
+    index.y = (int)(delta.y / board.cellSize) + sign.y;
     index.y *= -1;
 
     return index;
