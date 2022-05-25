@@ -2,6 +2,11 @@
 #include <stdio.h>
 #include "world.h"
 
+static inline int inView(Vector2 pos, size_t pad, Vector2 winSize) {
+    return (pos.x >= -(long)pad) && (pos.x <= winSize.x) &&
+        (pos.y >= -(long)pad) && (pos.y <= winSize.y);
+}
+
 void drawCells(board_t board) {
     Color pal[] = {BLACK, WHITE};
     for(size_t idx = 0; idx < board.chunks.size; idx++) {
@@ -20,6 +25,9 @@ void drawCells(board_t board) {
                     int y = (i + board.chunkSize * j) / board.chunkSize;
                     Vector2 abso = getAbsoluteCellIndex(current->index, (Vector2){x, y}, board.chunkSize);
                     Vector2 pos = getCellPosition(board, abso);
+
+                    if(!inView(pos, board.cellSize, (Vector2){width, height}))
+                        continue;
 
                     Rectangle rec = {
                         .x = pos.x,
