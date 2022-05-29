@@ -106,7 +106,8 @@ int main(int argc, char **argv) {
         if(IsKeyDown(KEY_F)) {
             Vector2 idx = getCellIndex(board, mouse);
             Vector2 chunkidx = getChunkIndex(idx, board.chunkSize);
-            chunk_t *chunk = find(board.chunks, chunkidx);
+            chunk_t *chunk = insert(&board.chunks, chunkidx, board.chunkSize);
+
             if(chunk) {
                 for(size_t x = 0; x < board.chunkSize; x++) {
                     for(size_t y = 0; y < board.chunkSize; y++) {
