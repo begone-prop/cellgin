@@ -1,2 +1,5 @@
 *.o
 tags
+libs/*
+include/*
+lib/*

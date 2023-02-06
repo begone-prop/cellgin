@@ -2,9 +2,27 @@
 #include <stdio.h>
 #include "world.h"
 
+static void printVector2(const char *msg, Vector2 vec) {
+    const char *M = msg ? msg : "";
+    fprintf(stderr, "%s: {x %f, y: %f}\n", M, vec.x, vec.y);
+}
+
 static inline int inView(Vector2 pos, size_t pad, Vector2 winSize) {
     return (pos.x >= -(long)pad) && (pos.x <= winSize.x) &&
         (pos.y >= -(long)pad) && (pos.y <= winSize.y);
+}
+
+void scaleWorld(board_t *board, Vector2 pos, float scale) {
+    if(scale == 0) return;
+
+    int old = board->cellSize;
+
+    if(board->cellSize <= 1) {
+        if(scale > 0) board->cellSize += scale;
+        else board->cellSize += scale;
+    } else {
+        board->cellSize += scale;
+    }
 }
 
 void drawCells(board_t board) {

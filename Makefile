@@ -1,19 +1,18 @@
 CC=gcc
-CFLAGS=-Wall -Wextra -std=c99 -Wpedantic
-#-flto -O2
+CFLAGS=-Wall -Wextra -std=c99 -Wpedantic -ggdb
 CLIBS=-lraylib -lm
 
-OBJ=sim.o game.o world.o hashmap.o
+OBJ=sim.o game.o world.o hashmap.o io.o
 
 BIN=game
 
 all: $(BIN)
 
 $(BIN): $(OBJ)
-	$(CC) $(CFLAGS) $(CLIBS) -o $@ $^
+	$(CC) $(CFLAGS) -o $@ $^ $(CLIBS)
 
 %.o: %.c
-	$(CC) $(CFLAGS) -c -o $@ $^
+	$(CC) $(CFLAGS) -c -o $@ $^ $(CLIBS)
 
 clean:
 	rm -f $(BIN) $(OBJ)

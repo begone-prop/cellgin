@@ -13,8 +13,8 @@
 #define VEDGE(A, B) (EDGE((A.x), (B)) || EDGE((A.y), (B)))
 #define V2EQ(A, B) (((A.x) == (B.x)) && ((A.y) == (B.y)))
 
-static const int width = 1000;
-static const int height = 1000;
+static const int width = 800;
+static const int height = 600;
 
 static const Vector2 screenCenter = {
     .x = (float) width / 2,
@@ -30,6 +30,7 @@ typedef struct board_t {
 
 void drawGrid(board_t);
 void drawCells(board_t);
+void scaleWorld(board_t *, Vector2, float);
 Vector2 getCellIndex(board_t, Vector2);
 Vector2 getCellPosition(board_t, Vector2);
 Vector2 getChunkPosition(board_t, Vector2);

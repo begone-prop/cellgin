@@ -8,6 +8,18 @@
 #include "sim.h"
 #include "world.h"
 #include "hashmap.h"
+#include "io.h"
+#include <unistd.h>
+
+/*
+   TODO:
+   + fix timeToLive bug
+   + fix zooming
+   + read game state from file
+   + write game state to file
+   + make game tick independent of fps
+   + multithreaded generation calculation
+*/
 
 int main(int argc, char **argv) {
     (void) argc;
@@ -50,13 +62,7 @@ int main(int argc, char **argv) {
     while(!WindowShouldClose()) {
         mouse = GetMousePosition();
 
-        float scale = GetMouseWheelMove();
-        if(scale != 0.0f) {
-            if(board.cellSize <= 1) {
-                if(scale > 0) board.cellSize += scale;
-                else board.cellSize = 1;
-            } else board.cellSize += (int)scale;
-        }
+        scaleWorld(&board, mouse, GetMouseWheelMove());
 
         if(IsMouseButtonDown(MOUSE_MIDDLE_BUTTON)) {
             Vector2 delta = Vector2Subtract(mouse, prevMouse);
@@ -73,6 +79,13 @@ int main(int argc, char **argv) {
 
         if(IsKeyPressed(KEY_DOWN)) {
             tick++;
+        }
+
+        if(IsKeyPressed(KEY_W)) {
+            const char *saveFile = "./state.gol";
+
+            fprintf(stderr, "Saving to file %s\n", saveFile);
+            writeGameState(&board, saveFile);
         }
 
         if(IsMouseButtonPressed(MOUSE_RIGHT_BUTTON)) {
@@ -121,9 +134,18 @@ int main(int argc, char **argv) {
             Vector2 idx = getCellIndex(board, mouse);
             Vector2 chunkidx = getChunkIndex(idx, board.chunkSize);
             chunk_t *chunk = find(board.chunks, chunkidx);
+            Vector2 neigh[8];
+
             if(chunk) {
-                memset(chunk->state, 0, chunkSize * chunkSize * sizeof(int));
-                chunk->alive = 0;
+                getChunkNeighbours(neigh, 8, chunk->index);
+                for(short n = 0; n < 8; n++) {
+                    chunk_t *cur = find(board.chunks, neigh[n]);
+                    if(cur) {
+                        memset(cur->state, 0, chunkSize * chunkSize * sizeof(int));
+                        cur->alive = 0;
+                    }
+                }
+
             }
         }
 
@@ -157,6 +179,21 @@ int main(int argc, char **argv) {
 
         drawCells(board);
         drawGrid(board);
+
+        size_t size = (width / board.cellSize) > 75 ?  board.cellSize * board.chunkSize : board.cellSize;
+        Vector2 offset = Vector2Subtract(mouse, board.origin);
+
+        Vector2 dist = {
+            (int)offset.x % (int)size,
+            (int)offset.y % (int)size
+        };
+
+        DrawLine(mouse.x, mouse.y, mouse.x - offset.x, mouse.y, RED);
+        DrawLine(mouse.x, mouse.y, mouse.x, mouse.y - offset.y, RED);
+
+        DrawLine(mouse.x, mouse.y, mouse.x - dist.x, mouse.y, GREEN);
+        DrawLine(mouse.x, mouse.y, mouse.x, mouse.y - dist.y, GREEN);
+
 
         prevMouse = mouse;
         frame = (frame + 1) % tick;
